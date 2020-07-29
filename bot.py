@@ -1,7 +1,11 @@
+import json
 import os
+import sys
+
 import praw
 import requests
 from dotenv import load_dotenv
+from time import sleep
 load_dotenv()
 
 reddit = praw.Reddit(
@@ -12,14 +16,35 @@ reddit = praw.Reddit(
     user_agent=f"r/{os.getenv('SUBREDDIT')}'s {os.getenv('BOT_USERNAME')}"
 )
 
-webhook_url = "https://discordapp.com/api/webhooks/738012677753929799/T26LHl9mjaCNdoFEanYAfX_ZgR9k7w7K6ZYZsffEnf0X_U34XZrlVaMs_5VoPvaa_7Vw"
-payload = {"content": "content"}
-headers = {"Content-Type": "application/json"}
 
-if len(reddit.subreddit(os.getenv("SUBREDDIT")).mod.modqueue) > os.getenv("MODQUEUE_FIRST_ALERT_LEN"):
-    payload["content"] = f"Mod Queue length has exceeded {os.getenv('MODQUEUE_FIRST_ALERT_LEN')}, someone go check it out!"
-    requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+webhook_url = os.getenv('WEBHOOK_URL')
 
-elif len(reddit.subreddit(os.getenv("SUBREDDIT")).mod.modqueue) > os.getenv("MODQUEUE_SECOND_ALERT_LEN"):
-    payload["content"] = f"@Evoker Mod Queue length has exceeded {os.getenv('MODQUEUE_SECOND_ALERT_LEN')}, someone go check it out urgently!"
-    requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+subreddit = os.getenv('SUBREDDIT')
+first_alert = int(os.getenv('FIRST_ALERT_LEN'))
+second_alert = int(os.getenv('SECOND_ALERT_LEN'))
+modrole = os.getenv('MOD_ROLE_ID')
+
+interval = int(os.getenv('INTERVAL'))
+
+
+class Utils:
+    @staticmethod
+    def send_message(message: str) -> None:
+        requests.post(url=webhook_url, data=json.dumps({
+            'content': message
+        }), headers={
+            'Content-Type': 'application/json'
+        })
+
+
+try:
+    while True:
+        if len(reddit.subreddit(subreddit).mod.modqueue) > first_alert:
+            Utils.send_message(f"The [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {first_alert}, someone go check it out!")
+
+        elif len(reddit.subreddit(subreddit).mod.modqueue) > second_alert:
+            Utils.send_message(f"<@&{modrole}>, the [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {second_alert}! Someone go check it out urgently!")
+
+        sleep(interval)
+except KeyboardInterrupt:
+    sys.exit()

@@ -39,11 +39,15 @@ class Utils:
 
 try:
     while True:
-        if len(reddit.subreddit(subreddit).mod.modqueue) > first_alert:
-            Utils.send_message(f"The [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {first_alert}, someone go check it out!")
+        modqueue_length: int = 0
 
-        elif len(reddit.subreddit(subreddit).mod.modqueue) > second_alert:
+        for i in reddit.subreddit(subreddit).mod.modqueue(limit=51):
+            modqueue_length += 1
+
+        if modqueue_length > second_alert:
             Utils.send_message(f"<@&{modrole}>, the [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {second_alert}! Someone go check it out urgently!")
+        elif modqueue_length > first_alert:
+            Utils.send_message(f"The [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {first_alert}, someone go check it out!")
 
         sleep(interval)
 except KeyboardInterrupt:

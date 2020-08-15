@@ -27,14 +27,12 @@ modrole = os.getenv('MOD_ROLE_ID')
 interval = int(os.getenv('INTERVAL'))
 
 
-class Utils:
-    @staticmethod
-    def send_message(message: str) -> None:
-        requests.post(url=webhook_url, data=json.dumps({
-            'content': message
-        }), headers={
-            'Content-Type': 'application/json'
-        })
+def send_message(message: str) -> None:
+    requests.post(url=webhook_url, data=json.dumps({
+        'content': message
+    }), headers={
+        'Content-Type': 'application/json'
+    })
 
 
 try:
@@ -45,9 +43,9 @@ try:
             modqueue_length += 1
 
         if modqueue_length > second_alert:
-            Utils.send_message(f"<@&{modrole}>, the [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {second_alert}! Someone go check it out urgently!")
+            send_message(f"<@&{modrole}>, the [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {second_alert}! Someone go check it out urgently!")
         elif modqueue_length > first_alert:
-            Utils.send_message(f"The [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {first_alert}, someone go check it out!")
+            send_message(f"The [modqueue](https://reddit.com/r/{subreddit}/about/modqueue) length has exceeded {first_alert}, someone go check it out!")
 
         sleep(interval)
 except KeyboardInterrupt:

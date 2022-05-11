@@ -39,7 +39,7 @@ try:
     while True:
         modqueue_length: int = 0
 
-        for i in reddit.subreddit(subreddit).mod.modqueue(limit=second_alert+1):
+        for i in reddit.subreddit(subreddit).mod.modqueue(limit=None):
             modqueue_length += 1
 
         if modqueue_length > second_alert:

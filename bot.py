@@ -39,11 +39,11 @@ try:
     while True:
         modqueue_length: int = 0
 
-        for i in reddit.subreddit(subreddit).mod.modqueue(limit=second_alert+1):
+        for i in reddit.subreddit(subreddit).mod.modqueue(limit=None):
             modqueue_length += 1
 
         if modqueue_length > second_alert:
-            send_message(f"<@&{modrole}>, the [modqueue](<https://reddit.com/r/{subreddit}/about/modqueue>) length has exceeded {second_alert}. Someone go check it out urgently!")
+            send_message(f"<@&{modrole}>, the [modqueue](<https://reddit.com/r/{subreddit}/about/modqueue>) length has exceeded {second_alert} ({modqueue_length}). Someone go check it out urgently!")
         elif modqueue_length > first_alert:
             send_message(f"The [modqueue](<https://reddit.com/r/{subreddit}/about/modqueue>) length has exceeded {first_alert} (currently at {modqueue_length}), someone go check it out!")
 
